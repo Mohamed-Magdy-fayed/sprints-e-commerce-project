@@ -101,7 +101,8 @@ const ImageInput = ({ id, setImages, init }) => {
             <div className="grid place-items-center relative">
                 <button type="button" onClick={() => {
                     setImage('')
-                    task.cancel()
+                    task.cancel && task.cancel()
+                    id !== 'image' ? setImages({ string: '', isRunning: false }) : setImages('')
                 }} className="text-white absolute top-1 right-1">
                     <MdOutlineClose />
                 </button>

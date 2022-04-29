@@ -278,7 +278,7 @@ const Navbar = () => {
                       />
                       <div className="z-10 absolute border rounded-b-md w-full bg-white flex flex-col">
                         {searchResults.slice(0, 5).map(product => (
-                          <p key={product._id} className="block px-3 py-2 hover:bg-slate-50">{product.name}</p>
+                          <Link key={product._id} to={`/product/${product._id}`} className="block px-3 py-2 hover:bg-slate-50">{product.name}</Link>
                         ))}
                       </div>
                     </div>
