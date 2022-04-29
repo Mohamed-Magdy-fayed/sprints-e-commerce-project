@@ -1,4 +1,4 @@
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import {
@@ -9,13 +9,28 @@ import {
   HeartIcon,
 } from "@heroicons/react/outline";
 import StoreContext from "../../context/store/StoreContext";
+import useDebounce from "../../hooks/useDebounce";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [searchShow, setSearchShow] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
   const { store, logoutUser } = useContext(StoreContext);
 
   const navigate = useNavigate();
+  useDebounce(() => handleChange(searchQuery), 500, [searchQuery])
+
+  const handleChange = (query) => {
+    setSearchResults(() => {
+      if (query.length === 0) {
+        return store.appData.products.slice(0, 5)
+      } else {
+        return store.appData.products.filter(p => p.name.toLowerCase().includes(query)).slice(0, 5)
+      }
+    })
+  }
 
   const toggleSearch = () => {
     setSearchShow(!searchShow);
@@ -248,16 +263,46 @@ const Navbar = () => {
 
               <div className="ml-auto flex items-center">
                 {/* Search */}
-                <div className="flex lg:ml-6">
-                  <button
-                    onClick={() => toggleSearch()}
-                    className="p-2 text-gray-400 hover:text-gray-500"
-                  >
-                    <span className="sr-only">Search</span>
-                    <SearchIcon className="w-6 h-6" aria-hidden="true" />
-                  </button>
-                  {/* Todo add search functionality */}
-                </div>
+                {searchShow ? (
+                  <div className="flex lg:ml-6">
+                    <div className="ml-6 relative">
+                      <label htmlFor="searchQuery" className="sr-only">Search Input</label>
+                      <input
+                        id="searchQuery"
+                        name="searchQuery"
+                        type='text'
+                        autoFocus={searchShow}
+                        className={`appearance-none w-full relative block px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 ${searchQuery.length > 0 ? 'rounded-t-md' : 'rounded-md'} focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      <div className="z-10 absolute border rounded-b-md w-full bg-white flex flex-col">
+                        {searchResults.slice(0, 5).map(product => (
+                          <p key={product._id} className="block px-3 py-2 hover:bg-slate-50">{product.name}</p>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toggleSearch()}
+                      className="p-2 text-gray-400 hover:text-gray-500"
+                    >
+                      <span className="sr-only">Search</span>
+                      <XIcon className="w-6 h-6" aria-hidden="true" />
+                    </button>
+                    {/* Todo add search functionality */}
+                  </div>
+                ) : (
+                  <div className="flex lg:ml-6">
+                    <button
+                      onClick={() => toggleSearch()}
+                      className="p-2 text-gray-400 hover:text-gray-500"
+                    >
+                      <span className="sr-only">Search</span>
+                      <SearchIcon className="w-6 h-6" aria-hidden="true" />
+                    </button>
+                    {/* Todo add search functionality */}
+                  </div>
+                )}
 
                 {/* Wish List */}
                 <div className="ml-4 flow-root lg:ml-6">
