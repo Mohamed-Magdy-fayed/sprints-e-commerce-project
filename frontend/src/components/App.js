@@ -11,7 +11,7 @@ import Home from "./views/main/Home";
 import { Shop } from "./views/main/Shop";
 import Special from "./views/main/Special";
 import Cart from "./views/profile/Cart";
-import Wishlist from "./views/profile/Wishlist";
+import WishList from "./views/profile/WishList";
 import ProductPage from "./views/product/ProductPage";
 import { useContext } from "react";
 import StoreContext from "../context/store/StoreContext";
@@ -34,7 +34,7 @@ const App = () => {
         <Route path="/help" element={<Help />} />
         <Route path="/special" element={<Special />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/wishlist" element={<WishList />} />
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/profile/:userId" element={<ProfilePage />} />
         <Route
