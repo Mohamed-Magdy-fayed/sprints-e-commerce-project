@@ -5,7 +5,7 @@ import StoreContext from "../context/store/StoreContext";
 
 export const useProtect = () => {
     const navigate = useNavigate();
-    const { loginUser, logoutUser, setAppData, setLoading } = useContext(StoreContext);
+    const { loginUser, logoutUser, setLoading } = useContext(StoreContext);
     const url = useLocation().pathname;
 
     const checkAuth = () => {

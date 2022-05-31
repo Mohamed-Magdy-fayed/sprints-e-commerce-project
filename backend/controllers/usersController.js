@@ -2,6 +2,33 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
 const User = require('../models/usersModel')
+const Product = require('../models/productsModel')
+const Orders = require('../models/ordersModel')
+
+// @desc    Gets all users
+// @route   POST /api/users
+// @access  Private
+const getAdminData = asyncHandler(async (req, res) => {
+  if (req.user.type === 'Admin' && req.user.status === 'Active') {
+    const users = await User.find()
+    const products = await Product.find()
+    const orders = await Orders.find()
+
+    if (users && products && orders) {
+      const data = {
+        users,
+        products,
+        orders,
+      }
+      res.status(200).json(data)
+    } else {
+      res.status(500).json({ error: 'unknowen server or DB error' })
+    }
+  } else {
+    res.status(401)
+    throw new Error(`Unauthorized, no privilges`)
+  }
+})
 
 // @desc    Gets all users
 // @route   POST /api/users
@@ -185,7 +212,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 // @route   PUT /api/users/:id/:location
 // @access  private
 const addItemToUser = asyncHandler(async (req, res) => {
-  if (req.user.type === 'Admin' && req.user.status === 'Active') {
+  if (req.user.status === 'Active') {
 
     const { itemID } = req.body
     const { id, location } = req.params
@@ -217,10 +244,10 @@ const addItemToUser = asyncHandler(async (req, res) => {
 })
 
 // @desc    Add a product to the user's cart, wishlist or orders
-// @route   PUT /api/users/:id/:location
+// @route   DELETE /api/users/:id/:location
 // @access  private
 const deleteItemFromUser = asyncHandler(async (req, res) => {
-  if (req.user.type === 'Admin' && req.user.status === 'Active') {
+  if (req.user.status === 'Active') {
 
     const { itemID } = req.body
     const { id, location } = req.params
@@ -236,6 +263,7 @@ const deleteItemFromUser = asyncHandler(async (req, res) => {
         }, {
           new: true
         })
+        console.log(data)
         res.status(200).json({
           updated: data
         })
@@ -261,6 +289,7 @@ const generateToken = (id) => {
 }
 
 module.exports = {
+  getAdminData,
   getUser,
   getUsers,
   registerUser,

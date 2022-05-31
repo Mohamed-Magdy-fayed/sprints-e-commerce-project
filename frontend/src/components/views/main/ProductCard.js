@@ -1,12 +1,37 @@
-import React from "react";
+import React, { useContext } from "react";
 //Ripples is lib. for ripples effects while clicking items
 import Ripples from "react-ripples";
 import { AiOutlineHeart } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import StoreContext from "../../../context/store/StoreContext";
+import LoginPage from "../authorization/LoginPage";
+import { addItemToUser } from "../../../context/store/StoreActions";
 //AiFillHeart when added to cart
 
 export default function ProductCard(props) {
+
+  const { store, showToast, showModal, addToCart } = useContext(StoreContext)
   const productData = props.productData;
+
+  const handleAddToCart = () => {
+
+    if (!store.auth.authed) {
+      showToast(`please login first to begin shopping!`, false)
+      showModal(LoginPage)
+      return
+    }
+
+    const isInCart = store.auth.user.cartItems.filter(p => p === productData._id).length > 0 ? true : false
+    if (isInCart) {
+      showToast(`You've already added this product to your cart!`, false)
+      return
+    }
+
+    addToCart(productData._id)
+    addItemToUser(store.auth.user._id, 'cartItems', productData._id)
+    showToast(`${productData.name} has been added to your cart`, true)
+  }
+
   return (
     <div className="max-w-[350px] text-left mx-auto text-dark font-bold snap-start select-none">
       {/*product image and link*/}
@@ -65,7 +90,7 @@ export default function ProductCard(props) {
         <p className="text-base mb-2">${productData.price}</p>
         <Ripples className="!block" color={"rgba(253,128,36,.1)"} during={2200}>
           {/*add to cart*/}
-          <button className="block w-full p-3 bg-[rgb(253,128,36)] font-bold text-sm uppercase  border-2 border-[rgb(253,128,36)] rounded focus:bg-white hover:bg-white focus:outline-none focus:outline-0 transition-all duration-500 ease-in-out">
+          <button onClick={() => handleAddToCart()} className="block w-full p-3 bg-[rgb(253,128,36)] font-bold text-sm uppercase  border-2 border-[rgb(253,128,36)] rounded focus:bg-white hover:bg-white focus:outline-none focus:outline-0 transition-all duration-500 ease-in-out">
             Add To Cart
           </button>
         </Ripples>

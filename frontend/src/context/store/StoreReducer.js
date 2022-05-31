@@ -62,6 +62,30 @@ const storeReducer = (state, action) => {
                 ...state,
                 productForm: action.payload,
             }
+        case 'ADD_TO_CART':
+            logger(state, action)
+            return {
+                ...state,
+                auth: {
+                    ...state.auth,
+                    user: {
+                        ...state.auth.user,
+                        cartItems: [...state.auth.user.cartItems, action.payload]
+                    }
+                },
+            }
+        case 'DELETE_FROM_CART':
+            logger(state, action)
+            return {
+                ...state,
+                auth: {
+                    ...state.auth,
+                    user: {
+                        ...state.auth.user,
+                        cartItems: state.auth.user.cartItems.filter(i => i !== action.payload)
+                    }
+                },
+            }
         default:
             return state
     }

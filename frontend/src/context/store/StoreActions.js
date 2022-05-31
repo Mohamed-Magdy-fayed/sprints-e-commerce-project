@@ -1,6 +1,20 @@
 import axios from 'axios'
 
-const token = `Bearer ${JSON.parse(localStorage.getItem('token')).token}`
+const token = `Bearer ${JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).token}`
+
+// Get all admin data from the DB
+export const getAdminDataAction = async () => {
+    /* Send data to API to add the product */
+    const config = {
+        method: "get",
+        url: `/api/users/admin`,
+        headers: {
+            'Authorization': token
+        }
+    };
+    const res = await axios(config)
+    return res.status === 200 ? res.data : null
+}
 
 // Get products from the DB
 export const getProductsAction = async () => {
@@ -177,6 +191,82 @@ export const deleteOrderAction = async (orderID) => {
     return res.status === 200 ? res.data : null
 }
 
+// Get coupons from the DB
+export const getCouponsAction = async () => {
+    /* Send data to API to get the coupons */
+    const config = {
+        method: "get",
+        url: `/api/coupons`,
+        headers: {
+            'Authorization': token
+        }
+    };
+    const res = await axios(config)
+    return res.status === 200 ? res.data : null
+}
+
+// Get one coupon from the DB
+export const getCouponAction = async (name) => {
+    if (!name) return [{}]
+    /* Send data to API to get the coupons */
+    const config = {
+        method: "get",
+        url: `/api/coupons/${name}`,
+        headers: {
+            'Authorization': token
+        }
+    };
+    const res = await axios(config)
+    return res.status === 200 ? res.data : null
+}
+
+// Add a coupon to the DB
+export const addCouponsAction = async (couponData) => {
+    /* Send data to API to add the coupon */
+    const config = {
+        method: 'post',
+        url: '/api/coupons',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        },
+        data: couponData
+    }
+    const res = await axios(config)
+    console.log(res);
+    return res.status === 201 ? res.data : null
+}
+
+// edit a coupon on the DB
+export const editCouponsAction = async (couponData) => {
+    /* Send data to API to edit the coupon */
+    const config = {
+        method: 'put',
+        url: `/api/coupons/${couponData.id}`,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        },
+        data: couponData
+    }
+    const res = await axios(config)
+    return res.status === 200 ? res.data : null
+}
+
+// Delete a coupon from the DB
+export const deleteCouponsAction = async (couponID) => {
+    const config = {
+        method: 'delete',
+        url: `/api/coupons/${couponID}`,
+        headers: {
+            'Authorization': token
+        },
+    }
+    /* Send data to API to delete the coupon */
+    const res = await axios(config)
+    return res.status === 200 ? res.data : null
+}
+
 // Get users from the DB
 export const getUsersAction = async () => {
     /* Send data to API to get the users */
@@ -246,26 +336,29 @@ export const addItemToUser = async (userID, location, itemID) => {
             'Content-Type': 'application/json',
             'Authorization': token
         },
-        data: itemID
+        data: { itemID }
     }
-    /* Send data to API to delete the user */
+
+    /* Send data to API to edit the user */
     const res = await axios(config)
+    console.log(res);
     return res.status === 200 ? res.data : null
 }
 
 // Delete an item from the user [cart, wishlist, orders]
 export const deleteItemFromUser = async (userID, location, itemID) => {
     const config = {
-        method: 'put',
+        method: 'delete',
         url: `/api/users/${userID}/${location}`,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': token
         },
-        data: itemID
+        data: { itemID }
     }
     /* Send data to API to delete the user */
     const res = await axios(config)
+    console.log(res);
     return res.status === 200 ? res.data : null
 }
 

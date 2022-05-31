@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import { useLocation } from 'react-router'
 import { deleteProductAction } from '../../context/store/StoreActions'
 import StoreContext from '../../context/store/StoreContext'
 
@@ -12,13 +13,15 @@ const Modal = () => {
     // to manage the state of the app for modals
     const { store, hideModal, setProductForm } = useContext(StoreContext)
 
+    const url = useLocation().pathname
+
     // hide it in case we close it
     if (!store.modal.isModal) {
         return
     }
 
     return (
-        <div className='h-full w-full bg-slate-400 bg-opacity-50 absolute inset-0'>
+        <div className='h-full w-full bg-slate-400 bg-opacity-50 fixed inset-0 z-10'>
             {/* Main modal */}
             <div className="static z-10 w-full inset-0 h-modal md:h-full grid place-items-center">
                 <div className="p-4 w-full max-w-md h-full md:h-auto">
@@ -26,7 +29,7 @@ const Modal = () => {
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                         <div className="flex justify-end p-2">
                             <button onClick={() => {
-                                if (!store.productForm.isEdit) {
+                                if (!store.productForm.isEdit && url === '/admin/dashboard/products') {
                                     hideModal()
                                     deleteProductAction(store.productForm.id)
                                     setProductForm('', false)

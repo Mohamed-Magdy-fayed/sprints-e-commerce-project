@@ -17,6 +17,8 @@ import axios from "axios";
 import StoreContext from "../../../context/store/StoreContext";
 import Spinner from "../../shared/Spinner";
 import { Link } from "react-router-dom";
+import LoginPage from "../authorization/LoginPage";
+import { addItemToUser } from "../../../context/store/StoreActions";
 
 const usersReviews = [
   {
@@ -59,7 +61,7 @@ const usersReviews = [
 
 const Product = () => {
 
-  const { store } = useContext(StoreContext)
+  const { store, showToast, showModal, addToCart } = useContext(StoreContext)
 
   const id = useLocation().pathname.split('t/')[1]
 
@@ -98,6 +100,25 @@ const Product = () => {
       }
     })
   }, [])
+
+  const handleAddToCart = () => {
+
+    if (!store.auth.authed) {
+      showToast(`please login first to begin shopping!`, false)
+      showModal(LoginPage)
+      return
+    }
+
+    const isInCart = store.auth.user.cartItems.filter(p => p === product._id).length > 0 ? true : false
+    if (isInCart) {
+      showToast(`You've already added this product to your cart!`, false)
+      return
+    }
+
+    addToCart(product._id)
+    addItemToUser(store.auth.user._id, 'cartItems', product._id)
+    showToast(`${product.name} has been added to your cart`, true)
+  }
 
   if (loading) {
     return <Spinner />
@@ -150,7 +171,7 @@ const Product = () => {
           className="mt-20 max-h-[600px] max-w-[750px]"
         >
           {product.images.map((image, index) => (
-            <SwiperSlide>
+            <SwiperSlide key={index}>
               <img
                 className="object-cover object-center w-full h-auto"
                 src={image}
@@ -234,7 +255,7 @@ const Product = () => {
               during={1200}
             >
               {/*add to cart*/}
-              <button className="block w-full p-3 bg-[rgb(253,128,36)] font-bold text-sm uppercase  border-2 border-[rgb(253,128,36)] rounded hover:bg-white focus:bg-white focus:outline-none transition-all duration-500 ease-in-out">
+              <button onClick={() => handleAddToCart()} className="block w-full p-3 bg-[rgb(253,128,36)] font-bold text-sm uppercase  border-2 border-[rgb(253,128,36)] rounded hover:bg-white focus:bg-white focus:outline-none transition-all duration-500 ease-in-out">
                 Add To Cart
               </button>
             </Ripples>

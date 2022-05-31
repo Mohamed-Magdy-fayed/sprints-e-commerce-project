@@ -95,7 +95,7 @@ const Navbar = () => {
                   </span>
                 </div>
 
-                <div className="flex flex-col">
+                <div className="flex flex-col w-[5px]">
                   <Link
                     to="/shop"
                     className="p-2 block font-medium text-gray-900 hover:bg-gray-100"
@@ -332,7 +332,7 @@ const Navbar = () => {
                       aria-hidden="true"
                     />
                     <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                      0
+                      {store.auth.authed ? store.auth.user.cartItems.length : 0}
                     </span>
                     <span className="sr-only">items in cart, view bag</span>
                   </Link>

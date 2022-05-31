@@ -43,11 +43,12 @@ const getOrder = asyncHandler(async (req, res) => {
 // @access  private
 const addOrder = asyncHandler(async (req, res) => {
     if (req.user.status === 'Active') {
-        const { userID, paymentMethod, coupon, status, products, totalValue } = req.body
+        const { userID, paymentMethod, transactionIID, coupon, status, products, totalValue } = req.body
 
         const newOrder = {
             userID,
             paymentMethod,
+            transactionIID,
             coupon,
             status,
             products,
@@ -100,7 +101,7 @@ const deleteOrder = asyncHandler(async (req, res) => {
 const editOrder = asyncHandler(async (req, res) => {
     if (req.user.status === 'Active') {
 
-        const { paymentMethod, coupon, status, products, totalValue } = req.body
+        const { paymentMethod, transactionIID, coupon, status, products, totalValue } = req.body
         const id = req.params.id
 
         // Check for order
@@ -109,6 +110,7 @@ const editOrder = asyncHandler(async (req, res) => {
         if (doc) {
             const data = await Orders.findOneAndUpdate({ _id: id }, {
                 paymentMethod,
+                transactionIID,
                 coupon,
                 status,
                 products,

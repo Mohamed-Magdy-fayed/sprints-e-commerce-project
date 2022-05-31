@@ -8,7 +8,7 @@ export const StoreProvider = ({ children }) => {
   const initialState = {
     auth: {
       user: {
-        id: 0,
+        id: "",
         firstName: "",
         lastName: "",
         email: "",
@@ -42,7 +42,7 @@ export const StoreProvider = ({ children }) => {
       orders: [],
       carousel: [],
     },
-    loading: false,
+    loading: true,
     productForm: {
       id: '',
       isEdit: false,
@@ -132,6 +132,20 @@ export const StoreProvider = ({ children }) => {
     })
   }
 
+  const addToCart = (productID) => {
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: productID
+    })
+  }
+
+  const deleteFromCart = (productID) => {
+    dispatch({
+      type: 'DELETE_FROM_CART',
+      payload: productID
+    })
+  }
+
   // const setAppData = async (collection) => {
   //   const config = {
   //     method: "get",
@@ -158,6 +172,8 @@ export const StoreProvider = ({ children }) => {
         hideToast,
         showModal,
         hideModal,
+        addToCart,
+        deleteFromCart,
         // setAppData,
         setData,
         setLoading,

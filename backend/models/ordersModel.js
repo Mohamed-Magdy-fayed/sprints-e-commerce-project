@@ -10,6 +10,9 @@ const ordersSchema = mongoose.Schema(
             type: String,
             required: [true, 'Please add a paymentMethod'],
         },
+        transactionID: {
+            type: String,
+        },
         coupon: {
             type: String,
         },
@@ -18,7 +21,10 @@ const ordersSchema = mongoose.Schema(
             required: [true, 'Please add a status'],
         },
         products: {
-            type: [String],
+            type: [{
+                productID: String,
+                amount: Number
+            }],
             required: [true, 'Please add products'],
         },
         totalValue: {

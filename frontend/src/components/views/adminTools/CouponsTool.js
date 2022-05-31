@@ -1,23 +1,32 @@
 import axios from "axios"
 import { useContext, useEffect, useState } from "react"
 import { MdAdd, MdDelete, MdEdit } from "react-icons/md"
+import { addCouponsAction, deleteCouponsAction, editCouponsAction, getCouponsAction } from "../../../context/store/StoreActions"
 import StoreContext from "../../../context/store/StoreContext"
 import CouponsForm from "../../shared/forms/CouponsForm"
 import Spinner from "../../shared/Spinner"
 
 const CouponsTool = () => {
-  const { store, showModal, hideModal, setAppData } = useContext(StoreContext)
+  const { store, showModal, hideModal, setData, showToast, setLoading } = useContext(StoreContext)
 
   const [searchResults, setSearchResults] = useState([])
-  const [loading, setLoading] = useState([])
+  const [reload, setReload] = useState(false)
 
   useEffect(() => {
-      setLoading(true)
-      setAppData('coupons').then((res) => {
-          setSearchResults(res)
-          setLoading(false)
-      })
-  }, [])
+    setLoading(true)
+    getCouponsAction().then((data) => {
+      if (!data) {
+        showToast('an error occurred, please try again', false)
+        setData('coupons', [])
+        setSearchResults([])
+        setLoading(false)
+      } else {
+        setData('coupons', data)
+        setSearchResults(data)
+        setLoading(false)
+      }
+    })
+  }, [reload])
 
   // submit the add form
   const handleAddSubmit = async (formStates) => {
@@ -26,29 +35,23 @@ const CouponsTool = () => {
 
     const couponData = {
       name: formStates.name,
-      available: formStates.available,
-      validtill: formStates.validtill,
-      discounttype: formStates.discounttype,
-      discountvalue: formStates.discountvalue,
-      minorder: formStates.minorder,
+      applyOnCash: formStates.applyOnCash,
+      isPercentage: formStates.isPercentage,
+      value: formStates.value,
+      isActive: formStates.isActive,
+      minValue: formStates.minValue,
+      validTill: formStates.validTill,
     }
-    console.log(couponData)
-
+    
     /* Send data to API to register a new user */
-    const config = {
-      method: 'post',
-      url: `https://mina-jpp1.herokuapp.com/api/coupons?token=${store.auth.token}`,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: couponData
-    }
-    const res = await axios(config)
-    console.log(res)
+    const newCoupon = await addCouponsAction(couponData)
     hideModal()
-    setAppData().then(() => {
+    getCouponsAction().then(() => {
+      setReload(!reload)
       setLoading(false)
     })
+
+    return newCoupon
   }
 
   // open the modal and fill it's content 
@@ -69,41 +72,39 @@ const CouponsTool = () => {
   const handleEditSubmit = async (formStates) => {
     setLoading(true)
     const couponData = {
+      id: formStates.id,
       name: formStates.name,
-      available: formStates.available,
-      validtill: formStates.validtill,
-      discounttype: formStates.discounttype,
-      discountvalue: formStates.discountvalue,
-      minorder: formStates.minorder,
+      applyOnCash: formStates.applyOnCash,
+      isPercentage: formStates.isPercentage,
+      value: formStates.value,
+      isActive: formStates.isActive,
+      minValue: formStates.minValue,
     }
 
     /* Send data to API to register a new user */
-    const config = {
-      method: 'put',
-      url: `https://mina-jpp1.herokuapp.com/api/coupons/${formStates.id}?token=${store.auth.token}`,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: couponData
-    }
-    const res = await axios(config)
-    console.log(res)
+    const newCoupon = await editCouponsAction(couponData)
     hideModal()
-    setAppData().then(() => {
+    getCouponsAction().then(() => {
+      setReload(!reload)
       setLoading(false)
     })
+
+    console.log(newCoupon);
+    return newCoupon
   }
 
   // opens edit modal
   const modalEdit = (index) => {
+    console.log(store.appData);
     const initStates = {
-      id: store.appData.coupons[index].id,
+      id: store.appData.coupons[index]._id,
       name: store.appData.coupons[index].name,
-      available: store.appData.coupons[index].available,
-      validtill: store.appData.coupons[index].validtill,
-      discounttype: store.appData.coupons[index].discounttype,
-      discountvalue: store.appData.coupons[index].discountvalue,
-      minorder: store.appData.coupons[index].minorder,
+      applyOnCash: store.appData.coupons[index].applyOnCash,
+      isPercentage: store.appData.coupons[index].isPercentage,
+      value: store.appData.coupons[index].value,
+      isActive: store.appData.coupons[index].isActive,
+      minValue: store.appData.coupons[index].minValue,
+      validTill: new Date(store.appData.coupons[index].validTill).toISOString().split('T')[0],
     }
 
     // fills the content for the edit modal
@@ -121,22 +122,22 @@ const CouponsTool = () => {
 
   const handleDelete = async (index) => {
     setLoading(true)
-    const cid = store.appData.coupons[index].id
+    const cid = store.appData.coupons[index]._id
     console.log(cid)
     /* Send data to API to register a new user */
-    const config = {
-      method: 'delete',
-      url: `https://mina-jpp1.herokuapp.com/api/coupons/${cid}?token=${store.auth.token}`,
-    }
-    const res = await axios(config)
-    setAppData().then(() => {
+    const res = await deleteCouponsAction(cid)
+    getCouponsAction().then(() => {
+      setReload(!reload)
       setLoading(false)
     })
+
+    console.log(res);
+    return res
   }
 
   return (
     <>
-      {loading
+      {store.loading
         ? (
           <Spinner />
         )
@@ -187,8 +188,8 @@ const CouponsTool = () => {
                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                           {coupon.name}
                         </th>
-                        <td className={`px-6 py-4 ${Date.parse(coupon.validtille && coupon.validtille.split('T')[0]) <= new Date().valueOf() ? 'text-red-500': ''}`}>
-                          {coupon.validtille.split('T')[0]}
+                        <td className={`px-6 py-4 ${coupon && coupon.validTill < Date.now() ? 'text-red-500' : ''}`}>
+                          {new Date(coupon.validTill).toISOString().split('T')[0]}
                         </td>
                         <td className="px-6 py-4 flex max-w-fit">
                           <button id={i} onClick={(e) => modalEdit(e.currentTarget.id)} className="group relative flex-grow flex justify-center py-2 px-4 border border-transparent text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:bg-indigo-700">

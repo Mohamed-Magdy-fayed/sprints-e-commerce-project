@@ -6,11 +6,12 @@ const CouponsForm = ({ initStates, onSubmit }) => {
     const { setLoading, store } = useContext(StoreContext)
 
     const [name, setName] = useState(initStates ? initStates.name : '')
-    const [available, setAvailable] = useState(initStates ? initStates.available : 0)
-    const [validtill, setValidtill] = useState(initStates ? initStates.validtill.split('T')[0] : new Date().toISOString().split('T')[0])
-    const [discounttype, setDiscounttype] = useState(initStates ? initStates.discounttype : 0)
-    const [discountvalue, setDiscountvalue] = useState(initStates ? initStates.discountvalue : 0)
-    const [minorder, setMinorder] = useState(initStates ? initStates.minorder : 0)
+    const [validTill, setValidTill] = useState(initStates ? initStates.validTill : Date.now())
+    const [applyOnCash, setApplyOnCash] = useState(initStates ? initStates.applyOnCash : false)
+    const [isPercentage, setIsPercentage] = useState(initStates ? initStates.isPercentage : false)
+    const [value, setValue] = useState(initStates ? initStates.value : '')
+    const [isActive, setIsActive] = useState(initStates ? initStates.isActive : false)
+    const [minValue, setMinValue] = useState(initStates ? initStates.minValue : '')
 
     // runs the onSubmit func provided as a prope giving it all the state so you can use it
     const handleSubmit = (e) => {
@@ -19,11 +20,12 @@ const CouponsForm = ({ initStates, onSubmit }) => {
         const formStates = {
             id: initStates ? initStates.id : 0,
             name,
-            available,
-            validtill,
-            discounttype: discounttype === 'Value' ? 0 : 1,
-            discountvalue: Number(discountvalue),
-            minorder: Number(minorder),
+            applyOnCash,
+            isPercentage,
+            value,
+            isActive,
+            minValue,
+            validTill: Date.parse(validTill),
         }
         onSubmit(formStates)
         setLoading(false)
@@ -50,87 +52,81 @@ const CouponsForm = ({ initStates, onSubmit }) => {
                 </div>
                 <div className='flex justify-between items-end'>
                     <div>
-                        <label htmlFor="validtill" className="">
+                        <label htmlFor="validTill" className="">
                             Valid Till
                         </label>
                         <input
-                            id="validtill"
-                            name="validtill"
+                            id="validTill"
+                            name="validTill"
                             type="date"
                             required
                             className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={validtill}
+                            value={validTill}
                             onChange={(e) => {
-                                console.log(validtill)
-                                setValidtill(e.target.value)
-                                console.log(validtill)
+                                console.log(validTill)
+                                setValidTill(e.target.value)
+                                console.log(validTill)
                             }}
                         />
                     </div>
                     <div className="m-2">
-                        <label htmlFor="avilable" className='m-2'>
-                            Available?
+                        <label htmlFor="isActive" className='m-2'>
+                            Is Active?
                         </label>
                         <input
-                            id="avilable"
-                            name="avilable"
+                            id="isActive"
+                            name="isActive"
                             type="checkbox"
                             className="relative px-3 py-2 rounded-md sm:text-sm"
-                            placeholder="Brand Origin"
-                            checked={available}
-                            onChange={(e) => setAvailable(e.target.checked ? 1 : 0)}
+                            checked={isActive}
+                            onChange={(e) => setIsActive(e.target.checked)}
                         />
                     </div>
                 </div>
                 <div className='flex flex-row justify-between items-center'>
                     <div className='w-1/2 grid place-items-center'>
-                        <label htmlFor="discountvalue" className="justify-self-start">
+                        <label htmlFor="value" className="justify-self-start">
                             Discount Value
                         </label>
                         <input
-                            id="discountvalue"
-                            name="discountvalue"
-                            type="number"
+                            id="value"
+                            name="value"
+                            type="text"
                             required
                             placeholder='20%'
                             className="appearance-none relative block w-1/2 px-3 py-2 justify-self-start border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={discountvalue}
-                            onChange={(e) => setDiscountvalue(e.target.value)}
+                            value={value}
+                            onChange={(e) => setValue(e.target.value)}
                         />
                     </div>
                     <div className='w-1/2 grid place-items-center'>
-                        <label htmlFor="minorder" className="justify-self-end">
+                        <label htmlFor="minValue" className="justify-self-end">
                             Minmum Order Value
                         </label>
                         <input
-                            id="minorder"
-                            name="minorder"
-                            type="number"
+                            id="minValue"
+                            name="minValue"
+                            type="text"
                             required
                             placeholder='1000$'
                             className="appearance-none relative block w-1/2 px-3 py-2 justify-self-end border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={minorder}
-                            onChange={(e) => setMinorder(e.target.value)}
+                            value={minValue}
+                            onChange={(e) => setMinValue(e.target.value)}
                         />
                     </div>
                 </div>
                 <div>
-                    <label htmlFor="discounttype">
+                    <label htmlFor="isPercentage">
                         Discount Type
                     </label>
-                    <select
-                        id="discounttype"
-                        name="discounttype"
-                        type="select"
-                        required
-                        value={discounttype === 0 ? 'Value': 'Percentage'}
+                    <input
+                        id="isPercentage"
+                        name="isPercentage"
+                        type="checkbox"
+                        value={!isPercentage}
                         className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                        placeholder="Discount Type"
-                        onChange={(e) => setDiscounttype(e.target.value)}
-                    >
-                        <option>Value</option>
-                        <option>Percentage</option>
-                    </select>
+                        onChange={(e) => setIsPercentage(e.target.checked)}
+                    />
                 </div>
                 <div className='flex justify-center'>
                     {store.loading

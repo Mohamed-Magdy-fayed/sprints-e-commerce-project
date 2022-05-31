@@ -18,7 +18,7 @@ export default function UserReview(props) {
         </div>
       </div>
 
-      <div class="flex items-center mb-1">
+      <div className="flex items-center mb-1">
         {[0, 1, 2, 3, 4].map((rating) => (
           <StarIcon
             key={rating}

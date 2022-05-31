@@ -1,18 +1,18 @@
 import { LockClosedIcon } from "@heroicons/react/solid";
 import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import StoreContext from "../../../context/store/StoreContext";
 
 const LoginPage = () => {
   // Connect to context
 
-  const { store, setLoading, loginUser, showToast } = useContext(StoreContext);
+  const { store, setLoading, loginUser, showToast, hideModal } = useContext(StoreContext);
 
+  const url = useLocation().pathname
   const navigate = useNavigate();
 
   // Form States
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -61,7 +61,11 @@ const LoginPage = () => {
     console.log(storage);
     localStorage.setItem("token", JSON.stringify(storage));
     setLoading(false);
-    navigate("/");
+    if (url.includes('login')) {
+      navigate("/")
+    } else {
+      hideModal()
+    }
   };
 
   // Form on forgot username
