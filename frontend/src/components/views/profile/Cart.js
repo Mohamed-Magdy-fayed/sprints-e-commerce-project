@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AiOutlineShoppingCart, AiOutlineUser } from "react-icons/ai";
+import { AiOutlineShoppingCart } from "react-icons/ai";
 import { GiPresent } from "react-icons/gi";
 import { BsInfoCircle, BsTrashFill } from "react-icons/bs";
 import { BsFillCreditCard2FrontFill } from "react-icons/bs";
@@ -13,11 +13,13 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "../../shared/forms/CheckoutForm";
 
-const stripePromise = api.getPublicStripeKey().then(key => loadStripe(key));
+const stripePromise = api.getPublicStripeKey()
+  .then(key => loadStripe(key))
+  .catch(e => console.log(e))
 
 export default function Cart() {
 
-  const { store, setData, showToast, showModal, setLoading, hideModal } = useContext(StoreContext)
+  const { store, setData, showToast, showModal, setLoading, hideModal, deleteFromCart } = useContext(StoreContext)
 
   const [total, setTotal] = useState(0)
   const [coupon, setCoupon] = useState(null)
@@ -70,9 +72,11 @@ export default function Cart() {
             setSuccess(true)
             setOrderID(res._id)
             addItemToUser(data.userID, 'orders', res._id)
-            hideModal()
-            products.map(id => deleteItemFromUser(data.userID, 'cartItems', id.productID))
+            products.forEach(product => {
+              deleteFromCart(product.productID)
+            })
             showToast(`thanks for your purchase your order status is currently ${res.status}`, true)
+            hideModal()
           } else {
             setSuccess(false)
             showToast(`an error occured please try again later`)
@@ -219,7 +223,7 @@ export default function Cart() {
                 </tr>
               </thead>
               <tbody>
-                {store.appData.products.length > 0 && store.auth.user.cartItems.map(item => {
+                {store.appData.products.length > 0 && store.auth.user.cartItems.length > 0 && store.auth.user.cartItems.map(item => {
                   const product = store.appData.products.filter(p => p._id === item)[0]
                   return <CartItemRow key={product._id} product={product} setProductsTotal={setProductsTotal} />
                 })}

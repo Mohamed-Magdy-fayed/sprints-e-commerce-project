@@ -223,6 +223,7 @@ const addItemToUser = asyncHandler(async (req, res) => {
     if (user) {
       if (!user[location].includes(itemID)) {
         user[location].push(itemID)
+        location === 'orders' ? user.cartItems = [] : null
         const data = await User.findOneAndUpdate({ _id: id }, user, {
           new: true
         })
@@ -281,6 +282,42 @@ const deleteItemFromUser = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc    Resets user password
+// @route   post /api/users/:id
+// @access  private
+const resetPassword = asyncHandler(async (req, res) => {
+  if (req.user.status === 'Active') {
+
+    const { oldPassword, newPassword } = req.body
+    const { id } = req.params
+    // Check for user
+    const user = await User.findById(id)
+
+    if (user && (await bcrypt.compare(oldPassword, user.password))) {
+
+      // Hash password
+      const salt = await bcrypt.genSalt(10)
+      const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+      const data = await User.findOneAndUpdate({ _id: id }, {
+        password: hashedPassword,
+      }, {
+        new: true
+      })
+      res.status(200).json({
+        updated: data
+      })
+    } else {
+      res.status(200).json({
+        error: 'incorrect old password'
+      })
+    }
+  } else {
+    res.status(401)
+    throw new Error(`Unauthorized, no privilges`)
+  }
+})
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -291,6 +328,7 @@ const generateToken = (id) => {
 module.exports = {
   getAdminData,
   getUser,
+  resetPassword,
   getUsers,
   registerUser,
   loginUser,

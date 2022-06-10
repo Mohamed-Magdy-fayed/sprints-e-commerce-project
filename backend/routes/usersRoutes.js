@@ -5,6 +5,7 @@ const router = express.Router()
 const {
   getAdminData,
   getUser,
+  resetPassword,
   getUsers,
   registerUser,
   loginUser,
@@ -21,8 +22,9 @@ const { protect } = require('../middleware/authMiddleware')
 router.get('/admin', protect, getAdminData)
 router.get('/', protect, getUsers)
 router.get('/:id', getUser)
-router.post('/', registerUser)
 router.post('/login', loginUser)
+router.post('/:id', protect, resetPassword)
+router.post('/', registerUser)
 router.put('/:id', protect, editUser)
 router.delete('/:id', protect, deleteUser)
 router.put('/:id/:location', protect, addItemToUser)

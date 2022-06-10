@@ -1,11 +1,12 @@
 const stripe = require('stripe')('sk_test_51L5EiVFDbvgQGIEPornZXqZP5CssLPPG5cGgpvWtPqCte0mktHetbVf4uHLd90JVNheVDc94tSgJMSfMxnJV2m5K00XRwv4vrJ')
 const asyncHandler = require('express-async-handler')
+require('dotenv').config()
 
 // @desc    Gets publishableKey
 // @route   GET /api/users
 // @access  Private
 const getPublishableKey = asyncHandler(async (req, res) => {
-    res.send({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY });
+    res.status(200).json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY });
 })
 
 // @desc    Gets all users

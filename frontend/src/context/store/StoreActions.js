@@ -281,6 +281,20 @@ export const getUsersAction = async () => {
     return res.status === 200 ? res.data : null
 }
 
+// Get a user from the DB
+export const getUserAction = async (id) => {
+    /* Send data to API to get the users */
+    const config = {
+        method: "get",
+        url: `/api/users/${id}`,
+        headers: {
+            'Authorization': token
+        }
+    };
+    const res = await axios(config)
+    return res.status === 200 ? res.data : null
+}
+
 // Add a user to the DB
 export const addUserAction = async (userData) => {
     /* Send data to API to add the user */
@@ -360,6 +374,25 @@ export const deleteItemFromUser = async (userID, location, itemID) => {
     const res = await axios(config)
     console.log(res);
     return res.status === 200 ? res.data : null
+}
+
+// Resets the user password
+export const resetPasswordAction = async (userID, oldPassword, newPassword) => {
+    const config = {
+        method: 'post',
+        url: `/api/users/${userID}`,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        },
+        data: {
+            oldPassword,
+            newPassword
+        }
+    }
+    /* Send data to API to reset the password */
+    const res = await axios(config)
+    return res.data
 }
 
 // // Get user and repos

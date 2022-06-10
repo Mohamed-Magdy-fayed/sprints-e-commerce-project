@@ -1,57 +1,65 @@
+import axios from 'axios'
+
 const token = `Bearer ${JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).token}`
 
 const createPaymentIntent = async options => {
-    return window
-        .fetch(`/payments/create-payment-intent`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': token
-            },
-            body: JSON.stringify(options)
-            // make sure to add amount and currency
-        })
-        .then(async res => {
-            if (res.status === 200) {
-                return res.json();
-            } else {
-                return null;
-            }
-        })
-        .then(data => {
-            if (!data || data.error) {
-                console.log("API error:", { data });
-                throw new Error("PaymentIntent API Error");
-            } else {
-                return data.client_secret;
-            }
-        });
+
+    if (!token) {
+        return
+    }
+    const config = {
+        method: 'post',
+        url: `/payments/create-payment-intent`,
+        headers: {
+            "Content-Type": "application/json",
+            'Authorization': token
+        },
+        data: JSON.stringify(options)
+        // make sure to add amount and currency
+    }
+
+    const res = await axios(config)
+    if (res.status === 200) {
+        const data = await res.data
+
+        if (!data || data.error) {
+            console.log("API error:", { data });
+            throw new Error("PaymentIntent API Error");
+        } else {
+            console.log(data.client_secret);
+            return data.client_secret;
+        }
+    } else {
+        return null;
+    }
 };
 
-const getPublicStripeKey = async options => {
-    return window
-        .fetch(`/payments/public-key`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': token
-            }
-        })
-        .then(res => {
-            if (res.status === 200) {
-                return res.json();
-            } else {
-                return null;
-            }
-        })
-        .then(data => {
-            if (!data || data.error) {
-                console.log("API error:", { data });
-                throw Error("API Error");
-            } else {
-                return data.publishableKey;
-            }
-        });
+const getPublicStripeKey = async () => {
+
+    if (!token) {
+        return
+    }
+
+    const config = {
+        method: 'get',
+        url: `/payments/public-key`,
+        headers: {
+            "Content-Type": "application/json",
+            'Authorization': token
+        },
+    }
+    const res = await axios(config)
+    if (res.status === 200) {
+        if (!res.data || res.data.error) {
+            console.log("API error:", { data: res.data });
+            throw Error("API Error");
+        } else {
+            console.log(res.data.publishableKey);
+            return res.data.publishableKey;
+        }
+    } else {
+        return null;
+    }
 };
 
 const api = {

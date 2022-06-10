@@ -6,13 +6,12 @@ import { addItemToUser, addOrderAction, deleteItemFromUser } from "../../../cont
 
 export default function CheckoutForm({ total, curr, coupon, products, orderTotal }) {
 
-  const { showToast, store, hideModal } = useContext(StoreContext)
+  const { showToast, store, hideModal, deleteFromCart } = useContext(StoreContext)
 
   const [orderID, setOrderID] = useState(0);
   const [amount, setAmount] = useState(0);
   const [currency, setCurrency] = useState("");
   const [clientSecret, setClientSecret] = useState(null);
-  const [error, setError] = useState('null');
   const [metadata, setMetadata] = useState(null);
   const [succeeded, setSucceeded] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -59,7 +58,9 @@ export default function CheckoutForm({ total, curr, coupon, products, orderTotal
       if (res) {
         setOrderID(res._id)
         addItemToUser(data.userID, 'orders', res._id)
-        products.map(id => deleteItemFromUser(data.userID, 'cartItems', id.productID))
+        products.map(product => {
+          deleteFromCart(product.productID)
+        })
         showToast(`thanks for your purchase your order status is currently ${res.status}`, true)
       } else {
         setSucceeded(false)
